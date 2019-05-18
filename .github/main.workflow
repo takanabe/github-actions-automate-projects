@@ -5,7 +5,13 @@ workflow "Add a new GitHub issue to a designate project column" {
 
 action "add-new-issues-to-project-column" {
   uses = "./"
-  // args = ["PROJECT NAME", "PROJECT_COLUMN_NAME"]
-  args = ["test project", "To do"]
+  //env = {
+  //  PROJECT_NAME  = "PROJECT_NAME"
+  //  PROJECT_COLUMN_NAME = "PROJECT_COLUMN_NAME"
+  //}
+  env = {
+    PROJECT_NAME  = "test project"
+    PROJECT_COLUMN_NAME = "To do"
+  }
   secrets = ["GITHUB_TOKEN"]
 }
