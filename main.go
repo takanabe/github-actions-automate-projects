@@ -104,7 +104,7 @@ func getGitHubClient() (*github.Client, context.Context) {
 func getProjectID(ctx context.Context, client *github.Client, owner, repo string) int64 {
 	pj := os.Args[1]
 	fmt.Printf("# Start searching project ID of %s...\n", pj)
-	projects, _, err := client.Repositories.ListProjects(oauth2.NoContext, owner, repo, nil)
+	projects, _, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
 
 	if _, ok := err.(*github.RateLimitError); ok {
 		log.Fatalf("[Error] Hit rate limit: %e", err)
@@ -135,7 +135,7 @@ func getProjectColumnID(ctx context.Context, client *github.Client, targetProjec
 	pjColumn := os.Args[2]
 	fmt.Printf("# Start searching project column ID of %s\n", pjColumn)
 
-	columns, _, err := client.Projects.ListProjectColumns(oauth2.NoContext, targetProjectID, nil)
+	columns, _, err := client.Projects.ListProjectColumns(ctx, targetProjectID, nil)
 
 	if _, ok := err.(*github.RateLimitError); ok {
 		log.Fatalf("[Error] Hit rate limit: %e", err)
@@ -163,7 +163,7 @@ func addIssueToProject(ctx context.Context, client *github.Client, issueID int64
 		ContentID:   issueID,
 		ContentType: "Issue",
 	}
-	card, _, err := client.Projects.CreateProjectCard(oauth2.NoContext, targetColumnID, opt)
+	card, _, err := client.Projects.CreateProjectCard(ctx, targetColumnID, opt)
 	if _, ok := err.(*github.RateLimitError); ok {
 		log.Fatalf("[Error] Hit rate limit: %e", err)
 	}
