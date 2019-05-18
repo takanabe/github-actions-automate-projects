@@ -104,13 +104,13 @@ func getGitHubClient() (*github.Client, context.Context) {
 func getProjectID(ctx context.Context, client *github.Client, owner, repo string) int64 {
 	pj := os.Getenv("PROJECT_NAME")
 	if pj == "" {
-		log.Fatal("[Error] Environment variable PROJECT_NAME is not defined in your workflow file")
+		log.Fatal("[ERROR] Environment variable PROJECT_NAME is not defined in your workflow file")
 	}
 	fmt.Printf("# Start searching project ID of %s...\n", pj)
 	projects, _, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
 
 	if _, ok := err.(*github.RateLimitError); ok {
-		log.Fatalf("[Error] Hit rate limit: %e", err)
+		log.Fatalf("[ERROR] Hit rate limit: %e", err)
 	}
 
 	var targetProjectID int64
@@ -126,7 +126,7 @@ func getProjectID(ctx context.Context, client *github.Client, owner, repo string
 	}
 
 	if targetProjectID == 0 {
-		log.Fatalf("[Error] No such a project name %s", pj)
+		log.Fatalf("[ERROR] No such a project name %s", pj)
 	}
 
 	return targetProjectID
@@ -137,14 +137,14 @@ func getProjectColumnID(ctx context.Context, client *github.Client, targetProjec
 
 	pjColumn := os.Getenv("PROJECT_COLUMN_NAME")
 	if pjColumn == "" {
-		log.Fatal("[Error] Environment variable PROJECT_COLUMN_NAME is not defined in your workflow file")
+		log.Fatal("[ERROR] Environment variable PROJECT_COLUMN_NAME is not defined in your workflow file")
 	}
 	fmt.Printf("# Start searching project column ID of %s\n", pjColumn)
 
 	columns, _, err := client.Projects.ListProjectColumns(ctx, targetProjectID, nil)
 
 	if _, ok := err.(*github.RateLimitError); ok {
-		log.Fatalf("[Error] Hit rate limit: %e", err)
+		log.Fatalf("[ERROR] Hit rate limit: %e", err)
 	}
 
 	for _, col := range columns {
@@ -157,7 +157,7 @@ func getProjectColumnID(ctx context.Context, client *github.Client, targetProjec
 	}
 
 	if targetColumnID == 0 {
-		log.Fatalf("[Error] No such a column name %s", pjColumn)
+		log.Fatalf("[ERROR] No such a column name %s", pjColumn)
 	}
 
 	return targetColumnID
@@ -171,7 +171,7 @@ func addIssueToProject(ctx context.Context, client *github.Client, issueID int64
 	}
 	card, _, err := client.Projects.CreateProjectCard(ctx, targetColumnID, opt)
 	if _, ok := err.(*github.RateLimitError); ok {
-		log.Fatalf("[Error] Hit rate limit: %e", err)
+		log.Fatalf("[ERROR] Hit rate limit: %e", err)
 	}
 
 	fmt.Printf("Created card %d! issue %d is placed to ColumnID %d", card.GetID(), issueID, targetColumnID)
