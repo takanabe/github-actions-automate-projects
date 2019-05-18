@@ -14,7 +14,10 @@ workflow "Add a new GitHub issue to the designate project column" {
 
 action "add-new-issues-to-project-column" {
   uses = "takanabe/add-new-issues-to-project-column@master"
-  args = ["PROJECT NAME", "PROJECT_COLUMN_NAME"]
+  env = {
+    PROJECT_NAME = "PROJECT_NAME"
+    PROJECT_COLUMN_NAME = "PROJECT_COLUMN_NAME"
+  }
   secrets = ["GITHUB_TOKEN"]
 }
 ```

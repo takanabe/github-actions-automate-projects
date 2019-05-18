@@ -102,7 +102,10 @@ func getGitHubClient() (*github.Client, context.Context) {
 }
 
 func getProjectID(ctx context.Context, client *github.Client, owner, repo string) int64 {
-	pj := os.Args[1]
+	pj := os.Getenv("PROJECT_NAME")
+	if pj == "" {
+		log.Fatal("[Error] Environment variable PROJECT_NAME is not defined in your workflow file")
+	}
 	fmt.Printf("# Start searching project ID of %s...\n", pj)
 	projects, _, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
 
@@ -132,7 +135,10 @@ func getProjectID(ctx context.Context, client *github.Client, owner, repo string
 func getProjectColumnID(ctx context.Context, client *github.Client, targetProjectID int64) int64 {
 	var targetColumnID int64
 
-	pjColumn := os.Args[2]
+	pjColumn := os.Getenv("PROJECT_COLUMN_NAME")
+	if pjColumn == "" {
+		log.Fatal("[Error] Environment variable PROJECT_COLUMN_NAME is not defined in your workflow file")
+	}
 	fmt.Printf("# Start searching project column ID of %s\n", pjColumn)
 
 	columns, _, err := client.Projects.ListProjectColumns(ctx, targetProjectID, nil)
