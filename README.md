@@ -4,22 +4,22 @@ GitHub Actions adding new issues to a designate project column automatically :re
 
 ## Usage
 
-Create `.github/main.workflow` file on your repository and edit like below.
+Create `.github/workflows/issues.yml` file on your repository and edit like below.
 
-```hcl
-workflow "Add a new GitHub issue to the designate project column" {
-  resolves = ["add-new-issues-to-project-column"]
-  on = "issues"
-}
-
-action "add-new-issues-to-project-column" {
-  uses = "takanabe/add-new-issues-to-project-column@master"
-  env = {
-    PROJECT_NAME = "PROJECT_NAME"
-    PROJECT_COLUMN_NAME = "PROJECT_COLUMN_NAME"
-  }
-  secrets = ["GITHUB_TOKEN"]
-}
+```yml
+on: issues
+name: Add a new GitHub issue to a designate project column
+jobs:
+  add-new-issues-to-project-column:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: add-new-issues-to-project-column
+      uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PROJECT_COLUMN_NAME: To do
+        PROJECT_NAME: test project
 ```
 
 You need to change `PROJECT_NAME` and `PROJECT_COLUMN_NAME` depending on your GitHub Project name and its column name.

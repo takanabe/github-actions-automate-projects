@@ -1,0 +1,13 @@
+on: issues
+name: Add a new GitHub issue to a designate project column
+jobs:
+  add-new-issues-to-project-column:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: add-new-issues-to-project-column
+      uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PROJECT_COLUMN_NAME: To do
+        PROJECT_NAME: test project
