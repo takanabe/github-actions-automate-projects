@@ -7,8 +7,8 @@ GitHub Actions adding new issues to a designate project column automatically :re
 Create `.github/workflows/issues.yml` file on your repository and edit like below.
 
 ```yml
-on: issues
 name: Add a new GitHub issue to a designate project column
+on: issues
 jobs:
   add-new-issues-to-project-column:
     runs-on: ubuntu-latest
@@ -18,11 +18,11 @@ jobs:
       uses: ./
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PROJECT_COLUMN_NAME: To do
-        PROJECT_NAME: test project
+        GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
+        GITHUB_PROJECT_COLUMN_NAME: To do
 ```
 
-You need to change `PROJECT_NAME` and `PROJECT_COLUMN_NAME` depending on your GitHub Project name and its column name.
+You need to change `GITHUB_PROJECT_URL` and `GITHUB_PROJECT_COLUMN_NAME` depending on your GitHub Project URL and column name to which you want to add new cards.
 
 ## Development
 
