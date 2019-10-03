@@ -13,6 +13,9 @@
       "env": {
         "GITHUB_TOKEN": ""
         "GITHUB_ACTION_LOCAL": true,
+        "GITHUB_PROJECT_URL": "",
+        "GITHUB_PROJECT_COLUMN_NAME": "To do",
+        "DEBUG": "true",
       },
       "args": [
         "test project",
