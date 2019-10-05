@@ -30,6 +30,16 @@ To develop GitHub Actions in your local environment, use [act](https://github.co
 
 VSCode debug config example is [here](https://github.com/takanabe/add-new-issues-to-project-column/blob/master/.vscode/launch.json.example). `GITHUB_TOKEN` is necessary to access your repository and  project.
 
+
+## Build Docker image and update DockerHub
+
+```
+$ docker build -f Dockerfile.build . -t add_issue_to_project
+$ docker image tag add_issue_to_project takanabe/add-new-issues-to-project-column:0.1
+$ docker login
+$ docker push takanabe/add-new-issues-to-project-column:0.1
+```
+
 ## License
 
 [Apache 2.0](https://github.com/takanabe/add-new-issues-to-project-column/blob/master/LICENSE)
