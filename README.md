@@ -28,6 +28,9 @@ jobs:
         GITHUB_PROJECT_COLUMN_NAME: To do
 ```
 
+1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues
+1. Replace the URL set on `GITHUB_PROJECT_COLUMN_NAME` to the string which your repository project has and want to place issues
+
 ### Organization-based project
 
 ```yml
