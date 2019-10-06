@@ -1,5 +1,8 @@
 # add-issues-to-project-column
 
+![Docker Automated build](https://img.shields.io/docker/automated/takanabe/add-new-issues-to-project-column.svg?logo=docker)
+![License](https://img.shields.io/github/license/takanabe/add-new-issues-to-project-column.svg)
+
 GitHub Actions adding new GitHub Issues to a specified GitHub Project column automatically :recycle:.
 
 ## Usage
