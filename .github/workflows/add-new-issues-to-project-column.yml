@@ -11,3 +11,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
         GITHUB_PROJECT_COLUMN_NAME: To do
+        DEBUG: true 
