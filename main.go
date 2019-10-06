@@ -291,7 +291,7 @@ func validateGitHubResponse(res *github.Response, err error) error {
 		return errors.Wrap(err, "Failed to get results from GitHub")
 	}
 
-	if res.Response.StatusCode != http.StatusOK {
+	if !(res.Response.StatusCode == http.StatusOK || res.Response.StatusCode == http.StatusCreated) {
 		return errors.Errorf("Invalid status code: %s. Failed to get results from GitHub", res.Status)
 	}
 	return nil
