@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -176,10 +177,14 @@ func projectParentName(rawURL string) (string, string, error) {
 
 func projectIDByRepo(ctx context.Context, client *github.Client, url, owner, repo string) (int64, error) {
 	var projectID int64
-	projects, _, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
+	projects, res, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
+	err = validateGitHubResponse(res, err)
+	if err != nil {
+		return 0, err
+	}
 
-	if _, ok := err.(*github.RateLimitError); ok {
-		return 0, errors.Wrap(err, "Hit rate limit")
+	if projects == nil {
+		return 0, errors.New("There are no projects on the repository named " + repo)
 	}
 
 	for _, project := range projects {
@@ -206,10 +211,10 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 		},
 	}
 
-	projects, _, err := client.Organizations.ListProjects(ctx, org, opt)
-
-	if _, ok := err.(*github.RateLimitError); ok {
-		return 0, errors.Wrap(err, "Hit rate limit")
+	projects, res, err := client.Organizations.ListProjects(ctx, org, opt)
+	err = validateGitHubResponse(res, err)
+	if err != nil {
+		return 0, err
 	}
 
 	for _, project := range projects {
@@ -229,9 +234,10 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 
 func projectColumnID(ctx context.Context, client *github.Client, pjID int64, pjColumn string) (int64, error) {
 	var columnID int64
-	columns, _, err := client.Projects.ListProjectColumns(ctx, pjID, nil)
-	if _, ok := err.(*github.RateLimitError); ok {
-		return 0, errors.Wrap(err, "Hit rate limit")
+	columns, res, err := client.Projects.ListProjectColumns(ctx, pjID, nil)
+	err = validateGitHubResponse(res, err)
+	if err != nil {
+		return 0, err
 	}
 
 	for _, col := range columns {
@@ -255,9 +261,11 @@ func addIssueToProject(ctx context.Context, client *github.Client, issueID int64
 		ContentID:   issueID,
 		ContentType: "Issue",
 	}
-	card, _, err := client.Projects.CreateProjectCard(ctx, columnID, opt)
-	if _, ok := err.(*github.RateLimitError); ok {
-		log.Fatalf("[ERROR] Hit rate limit: %e", err)
+	card, res, err := client.Projects.CreateProjectCard(ctx, columnID, opt)
+
+	err = validateGitHubResponse(res, err)
+	if err != nil {
+		return err
 	}
 
 	if card.GetID() == 0 {
@@ -273,4 +281,18 @@ func errCheck(err error) {
 		errorLog(err)
 		os.Exit(1)
 	}
+}
+
+func validateGitHubResponse(res *github.Response, err error) error {
+	if err != nil {
+		if _, ok := err.(*github.RateLimitError); ok {
+			return errors.Wrap(err, "Hit GitHub API rate limit")
+		}
+		return errors.Wrap(err, "Failed to get results from GitHub")
+	}
+
+	if res.Response.StatusCode != http.StatusOK {
+		return errors.Errorf("Invalid status code: %s. Failed to get results from GitHub", res.Status)
+	}
+	return nil
 }
