@@ -21,16 +21,15 @@ import (
 func main() {
 	payload := issueEventPayload()
 
-	// Get issue ID from payload to put it on designated GitHub project
-	issueID := IssueID(payload)
+	issueID := extractIssueID(payload)
 	infoLog("New issue is found!!")
 	debugLog("Issue ID: %d\n", issueID)
 
 	client, ctx := getGitHubClient()
 
-	// Project type investigation
 	url := os.Getenv("GITHUB_PROJECT_URL")
 	if url == "" {
+		log.Println("[ERROR] Environment variable GITHUB_PROJECT_URL is not defined in your workflow file")
 		os.Exit(1)
 	}
 
@@ -117,8 +116,8 @@ func issueEventPayload() github.IssuesEvent {
 	return payload
 }
 
-// IssueID returns GitHub issue ID to place onto the designated GitHub project
-func IssueID(payload github.IssuesEvent) int64 {
+// extractIssueID returns GitHub issue ID extracted from event payloads
+func extractIssueID(payload github.IssuesEvent) int64 {
 	return payload.GetIssue().GetID()
 }
 
