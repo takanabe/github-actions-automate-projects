@@ -6,18 +6,17 @@
 [![Docker Automated build](https://img.shields.io/docker/automated/takanabe/github-actions-automate-projects.svg?logo=docker)][dockerhub]
 [![License](https://img.shields.io/github/license/takanabe/github-actions-automate-projects.svg)][license]
 
-GitHub Actions adding GitHub Issues & Pull requests to a specified GitHub Project column automatically :recycle:. This GitHub Action is inspired by https://github.com/masutaka/github-actions-all-in-one-project
+GitHub Actions adding GitHub Issues & Pull requests to the specified GitHub Project column automatically :recycle:. This GitHub Action is inspired by https://github.com/masutaka/github-actions-all-in-one-project
 
 ## Usage
 
-GitHub Projects belong to organizations, repositories, and users. This GitHub action currently does not support user-based GitHub Project. Create `.github/workflows/issues.yml` file on your repository and edit like below.
+GitHub Projects belong to organizations, repositories, and users. This GitHub action currently does not support user-based GitHub Project. For any type of GitHub Projects, you need to change `GITHUB_PROJECT_URL` and `GITHUB_PROJECT_COLUMN_NAME` depending on your GitHub Project URL and column name to which you want to add new cards. Create `.github/workflows/issues.yml` file on your repository and edit like below.
 
-For any type of GitHub Projects, you need to change `GITHUB_PROJECT_URL` and `GITHUB_PROJECT_COLUMN_NAME` depending on your GitHub Project URL and column name to which you want to add new cards.
 
 ### Repository-based project
 
 ```yml
-name: Add a new GitHub Project card linked to a GitHub issue to a specified project column
+name: Add a new GitHub Project card linked to a GitHub issue to the specified project column
 on: [issues, pull_request]
 jobs:
   github-actions-automate-projects:
@@ -45,7 +44,7 @@ jobs:
 ### Organization-based project
 
 ```yml
-name: Add a new GitHub issue to a designate project column
+name: Add a new GitHub issue to the specified project column
 on: [issues, pull_request]
 jobs:
   add-new-issues-to-project-column:
@@ -65,7 +64,8 @@ jobs:
 1. Replace the secret set on ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }} to your personal GitHub token
    1. Create a new personal access token from https://github.com/settings/tokens
    1. Create a new personal access token from https://github.com/organization_name/repository_name/settings/secrets with the value of personal access token you created above
-   1. Replace the pesonal token name from ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }} to ${{ secrets.YOUR_NEW_PERSONAL_TOKEN }}
+   1. Replace the personal token name from ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }} to ${{ secrets.YOUR_NEW_PERSONAL_TOKEN }}
+   1. Link repositories to the project from https://github.com/orgs/organization_name/projects/1/settings/linked_repositories
 
 ### User-based project
 
@@ -86,10 +86,10 @@ User-based project is not supported yet
 
 You can easily detect [event contexts](https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions#github-context) and use them in if statements. Here are some lists of the useful contexts for this GitHub action.
 
-| Property name       | Values                                                                                                                                                                              | Description                                                                                                                                                                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| github.event.action | opened, closed, edited, and so on                                                                                                                                                   | The name of actions (references for [issues](https://developer.github.com/v3/activity/events/types/#issuesevent) and for [pull_request](https://developer.github.com/v3/activity/events/types/#pullrequestevent) |
-| github.event_name   | [issues](https://developer.github.com/v3/activity/events/types/#webhook-event-name-19), [pull_quests](https://developer.github.com/v3/activity/events/types/#webhook-event-name-33) | The name of the event that triggered the workflow run                                                                                                                                                            |
+| Property name       | Values                                                                                                                                                                               | Description                                                                                                                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| github.event.action | opened, closed, edited, and so on                                                                                                                                                    | The name of actions (references for [issues](https://developer.github.com/v3/activity/events/types/#issuesevent) and for [pull_request](https://developer.github.com/v3/activity/events/types/#pullrequestevent) |
+| github.event_name   | [issues](https://developer.github.com/v3/activity/events/types/#webhook-event-name-19), [pull_request](https://developer.github.com/v3/activity/events/types/#webhook-event-name-33) | The name of the event that triggered the workflow run                                                                                                                                                            |
 
 ## Development
 
