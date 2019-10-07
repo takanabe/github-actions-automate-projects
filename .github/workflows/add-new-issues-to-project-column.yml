@@ -1,14 +1,13 @@
-name: Add a new GitHub issue to a designate project column
-on: issues
+name: Add a new GitHub Project card linked to a GitHub issue to a specified project column
+on: [issues, pull_request]
 jobs:
   add-new-issues-to-project-column:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: add-new-issues-to-project-column
-      uses: ./
+    - name: add-new-issues-to-repository-based-project-column
+      uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      if: github.event_name == 'issues' && github.event.action == 'opened
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
         GITHUB_PROJECT_COLUMN_NAME: To do
-        DEBUG: true 

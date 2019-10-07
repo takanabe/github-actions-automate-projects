@@ -15,13 +15,21 @@ For any type of GitHub Projects, you need to change `GITHUB_PROJECT_URL` and `GI
 
 ```yml
 name: Add a new GitHub Project card linked to a GitHub issue to a specified project column
-on: issues
+on: [issues, pull_request]
 jobs:
   add-new-issues-to-project-column:
     runs-on: ubuntu-latest
     steps:
     - name: add-new-issues-to-repository-based-project-column
       uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      if: github.event_name == 'issues' && github.event.action == 'opened'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
+        GITHUB_PROJECT_COLUMN_NAME: To do
+    - name: add-new-prs-to-repository-based-project-column
+      uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      if: github.event_name == 'pull_request' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
@@ -35,17 +43,18 @@ jobs:
 
 ```yml
 name: Add a new GitHub issue to a designate project column
-on: issues
+on: [issues, pull_request]
 jobs:
   add-new-issues-to-project-column:
     runs-on: ubuntu-latest
     steps:
     - name: add-new-issues-to-organization-based-project-column
       uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      if: github.event_name == 'issues' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }}
         GITHUB_PROJECT_URL: https://github.com/orgs/organization_name/projects/1
-        GITHUB_PROJECT_COLUMN_NAME: test
+        GITHUB_PROJECT_COLUMN_NAME: To Do
 ```
 
 1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues
@@ -59,6 +68,8 @@ jobs:
 
 User-based project is not supported yet
 
+## Configurations
+
 ### Environment variables
 
 | Environment variable       | Value                                                                                                                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -67,6 +78,15 @@ User-based project is not supported yet
 | GITHUB_PROJECT_URL         | https://github.com/username/reponame/projects/1, https://github.com/orgname/reponame/projects/1, https://github.com/orgs/orgname/projects/1 | A GitHub Project URL you want to use                                                                                                                                                                                                                                                                                                                                                                                                       |
 | GITHUB_PROJECT_COLUMN_NAME | Anything (e.g: To Do)                                                                                                                       | A GitHub Project column name you want to place new issues                                                                                                                                                                                                                                                                                                                                                                                  |
 | DEBUG                      | Anything (e.g: true)                                                                                                                        | A flag to produce debug messages for this GitHub Actions if this environment variable exists                                                                                                                                                                                                                                                                                                                                               |
+
+### Condition with contexts
+
+You can easily detect [event contexts](https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions#github-context) and use them in if statements. Here are some lists of the useful contexts for this GitHub action.
+
+| Property name       | Values                                                                                                                                                                              | Description                                                                                                                                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| github.event.action | opened, closed, edited, and so on                                                                                                                                                   | The name of actions (references for [issues](https://developer.github.com/v3/activity/events/types/#issuesevent) and for [pull_request](https://developer.github.com/v3/activity/events/types/#pullrequestevent) |
+| github.event_name   | [issues](https://developer.github.com/v3/activity/events/types/#webhook-event-name-19), [pull_quests](https://developer.github.com/v3/activity/events/types/#webhook-event-name-33) | The name of the event that triggered the workflow run                                                                                                                                                            |
 
 ## Development
 
