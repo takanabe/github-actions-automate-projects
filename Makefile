@@ -1,5 +1,5 @@
-IMAGE_NAME=add-new-issues-to-project-column
-DOCKER_REPO=takanabe/add-new-issues-to-project-column
+IMAGE_NAME=github-actions-automate-projects
+DOCKER_REPO=takanabe/github-actions-automate-projects
 TAG_NAME=sandbox
 
 #

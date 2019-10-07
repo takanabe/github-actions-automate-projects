@@ -20,7 +20,7 @@ func main() {
 	infoLog("Event name: %s\n", eventName)
 	if !(eventName == "issues" || eventName == "pull_request") {
 		infoLog("This GitHub event is neither issues nor pull_requests. Stop executing this action.")
-		infoLog("Please add 'if github.event_name' to the workflow yaml by following https://github.com/takanabe/add-new-issues-to-project-column/blob/master/README.md ")
+		infoLog("Please add 'if github.event_name' to the workflow yaml by following https://github.com/takanabe/github-actions-automate-projects/blob/master/README.md ")
 		os.Exit(0)
 	}
 

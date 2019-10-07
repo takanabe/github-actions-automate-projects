@@ -1,10 +1,10 @@
-# add-issues-to-project-column
+# github-actions-automate-projects
 
-[dockerhub]: https://hub.docker.com/r/takanabe/add-new-issues-to-project-column
-[license]: https://github.com/takanabe/add-new-issues-to-project-column/blob/master/LICENSE
+[dockerhub]: https://hub.docker.com/r/takanabe/github-actions-automate-projects
+[license]: https://github.com/takanabe/github-actions-automate-projects/blob/master/LICENSE
 
-[![Docker Automated build](https://img.shields.io/docker/automated/takanabe/add-new-issues-to-project-column.svg?logo=docker)][dockerhub]
-[![License](https://img.shields.io/github/license/takanabe/add-new-issues-to-project-column.svg)][license]
+[![Docker Automated build](https://img.shields.io/docker/automated/takanabe/github-actions-automate-projects.svg?logo=docker)][dockerhub]
+[![License](https://img.shields.io/github/license/takanabe/github-actions-automate-projects.svg)][license]
 
 GitHub Actions adding GitHub Issues & Pull requests to a specified GitHub Project column automatically :recycle:. This GitHub Action is inspired by https://github.com/masutaka/github-actions-all-in-one-project
 
@@ -20,22 +20,22 @@ For any type of GitHub Projects, you need to change `GITHUB_PROJECT_URL` and `GI
 name: Add a new GitHub Project card linked to a GitHub issue to a specified project column
 on: [issues, pull_request]
 jobs:
-  add-new-issues-to-project-column:
+  github-actions-automate-projects:
     runs-on: ubuntu-latest
     steps:
     - name: add-new-issues-to-repository-based-project-column
-      uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      uses: docker://takanabe/github-actions-automate-projects:v0.0.1
       if: github.event_name == 'issues' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
+        GITHUB_PROJECT_URL: https://github.com/takanabe/github-actions-automate-projects/projects/1
         GITHUB_PROJECT_COLUMN_NAME: To do
     - name: add-new-prs-to-repository-based-project-column
-      uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      uses: docker://takanabe/github-actions-automate-projects:v0.0.1
       if: github.event_name == 'pull_request' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
+        GITHUB_PROJECT_URL: https://github.com/takanabe/github-actions-automate-projects/projects/1
         GITHUB_PROJECT_COLUMN_NAME: To do
 ```
 
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: add-new-issues-to-organization-based-project-column
-      uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
+      uses: docker://takanabe/github-actions-automate-projects:v0.0.1
       if: github.event_name == 'issues' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }}
@@ -101,8 +101,8 @@ Change `IMAGE_NAME`, `DOCKER_REPO` and `TAG_NAME` in `Makefile` based on your Do
 make
 ```
 
-Except for `sandbox` tag, [`takanabe/add-new-issues-to-project-column`](https://hub.docker.com/r/takanabe/add-new-issues-to-project-column/tags) lists production ready Docker images matching [GitHub release tag](https://github.com/takanabe/add-new-issues-to-project-column/releases).
+Except for `sandbox` tag, [`takanabe/github-actions-automate-projects`](https://hub.docker.com/r/takanabe/github-actions-automate-projects/tags) lists production ready Docker images matching [GitHub release tag](https://github.com/takanabe/github-actions-automate-projects/releases).
 
 ## License
 
-[Apache 2.0](https://github.com/takanabe/add-new-issues-to-project-column/blob/master/LICENSE)
+[Apache 2.0](https://github.com/takanabe/github-actions-automate-projects/blob/master/LICENSE)
