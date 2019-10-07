@@ -1,0 +1,9 @@
+name: 'Automate projects'
+description: 'GitHub Actions adding GitHub Issues & Pull requests to the specified GitHub Project column automatically ♻️'
+author: 'takanabe'
+branding:
+  icon: 'play-circle'
+  color: 'purple'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
