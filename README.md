@@ -1,9 +1,12 @@
 # add-issues-to-project-column
 
-![Docker Automated build](https://img.shields.io/docker/automated/takanabe/add-new-issues-to-project-column.svg?logo=docker)
-![License](https://img.shields.io/github/license/takanabe/add-new-issues-to-project-column.svg)
+[dockerhub]: https://hub.docker.com/r/takanabe/add-new-issues-to-project-column
+[license]: https://github.com/takanabe/add-new-issues-to-project-column/blob/master/LICENSE
 
-GitHub Actions adding new GitHub Issues to a specified GitHub Project column automatically :recycle:. This GitHub Action is inspired by https://github.com/masutaka/github-actions-all-in-one-project
+[![Docker Automated build](https://img.shields.io/docker/automated/takanabe/add-new-issues-to-project-column.svg?logo=docker)][dockerhub]
+[![License](https://img.shields.io/github/license/takanabe/add-new-issues-to-project-column.svg)][license]
+
+GitHub Actions adding GitHub Issues & Pull requests to a specified GitHub Project column automatically :recycle:. This GitHub Action is inspired by https://github.com/masutaka/github-actions-all-in-one-project
 
 ## Usage
 
@@ -36,8 +39,8 @@ jobs:
         GITHUB_PROJECT_COLUMN_NAME: To do
 ```
 
-1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues
-1. Replace the URL set on `GITHUB_PROJECT_COLUMN_NAME` to the string which your repository project has and want to place issues
+1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues/pull-requests
+1. Replace the URL set on `GITHUB_PROJECT_COLUMN_NAME` to the string which your repository project has and want to place issues/pull-requests
 
 ### Organization-based project
 
@@ -57,8 +60,8 @@ jobs:
         GITHUB_PROJECT_COLUMN_NAME: To Do
 ```
 
-1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues
-1. Replace the URL set on `GITHUB_PROJECT_COLUMN_NAME` to the string which your repository project has and want to place issues
+1. Replace the URL set on `GITHUB_PROJECT_URL` to the URL of your repository project to place issues/pull-requests
+1. Replace the URL set on `GITHUB_PROJECT_COLUMN_NAME` to the string which your repository project has and want to place issues/pull-requests
 1. Replace the secret set on ${{ secrets.GITHUB_PERSONAL_TOKEN_TO_ADD_PROJECT }} to your personal GitHub token
    1. Create a new personal access token from https://github.com/settings/tokens
    1. Create a new personal access token from https://github.com/organization_name/repository_name/settings/secrets with the value of personal access token you created above
@@ -72,12 +75,12 @@ User-based project is not supported yet
 
 ### Environment variables
 
-| Environment variable       | Value                                                                                                                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GITHUB_TOKEN               | ${{ secrets.GITHUB_TOKEN }}, ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}                                                                    | An Access token to access your issues and projects. if you use repository-based projects, ${{ secrets.GITHUB_TOKEN }} provides appropriate access privileges to this GitHub action ([See](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret)). If that is not enough, you need to pass ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }} by issuing personal access token with appropriate grants. |
-| GITHUB_PROJECT_URL         | https://github.com/username/reponame/projects/1, https://github.com/orgname/reponame/projects/1, https://github.com/orgs/orgname/projects/1 | A GitHub Project URL you want to use                                                                                                                                                                                                                                                                                                                                                                                                       |
-| GITHUB_PROJECT_COLUMN_NAME | Anything (e.g: To Do)                                                                                                                       | A GitHub Project column name you want to place new issues                                                                                                                                                                                                                                                                                                                                                                                  |
-| DEBUG                      | Anything (e.g: true)                                                                                                                        | A flag to produce debug messages for this GitHub Actions if this environment variable exists                                                                                                                                                                                                                                                                                                                                               |
+| Environment variable       | Value                                                                                                                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GITHUB_TOKEN               | ${{ secrets.GITHUB_TOKEN }}, ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}                                                                    | An Access token to access your repository and projects. if you use repository-based projects, ${{ secrets.GITHUB_TOKEN }} provides appropriate access privileges to this GitHub action ([See](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret)). If that is not enough, you need to pass ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }} by issuing personal access token with appropriate grants. |
+| GITHUB_PROJECT_URL         | https://github.com/username/reponame/projects/1, https://github.com/orgname/reponame/projects/1, https://github.com/orgs/orgname/projects/1 | A GitHub Project URL you want to use                                                                                                                                                                                                                                                                                                                                                                                                           |
+| GITHUB_PROJECT_COLUMN_NAME | Anything (e.g: To Do)                                                                                                                       | A GitHub Project column name you want to place issues/pull-requests                                                                                                                                                                                                                                                                                                                                                                            |
+| DEBUG                      | Anything (e.g: true)                                                                                                                        | A flag to produce debug messages for this GitHub Actions if this environment variable exists                                                                                                                                                                                                                                                                                                                                                   |
 
 ### Condition with contexts
 
