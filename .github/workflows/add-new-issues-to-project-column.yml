@@ -6,7 +6,7 @@ jobs:
     steps:
     - name: add-new-issues-to-repository-based-project-column
       uses: docker://takanabe/add-new-issues-to-project-column:v0.0.1
-      if: github.event_name == 'issues' && github.event.action == 'opened
+      if: github.event_name == 'issues' && github.event.action == 'opened'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_PROJECT_URL: https://github.com/takanabe/add-new-issues-to-project-column/projects/1
