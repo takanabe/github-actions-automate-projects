@@ -1,7 +1,7 @@
-FROM takanabe/github-actions-automate-projects:sandbox
+FROM takanabe/github-actions-automate-projects:v0.0.1
 
-LABEL "com.github.actions.name"="Add new issues to a designate project column"
-LABEL "com.github.actions.description"="GitHub Actions adding new issues to a specified project column automatically"
+LABEL "com.github.actions.name"="Automate projects"
+LABEL "com.github.actions.description"="GitHub Actions adding GitHub Issues & Pull requests to the specified GitHub Project column automatically ♻️"
 LABEL "com.github.actions.icon"="terminal"
 LABEL "com.github.actions.color"="purple"
 
