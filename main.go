@@ -2,14 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -19,17 +14,37 @@ import (
 )
 
 func main() {
-	payload := issueEventPayload()
+	// Event name is kept in GITHUB_EVENT_NAME
+	// https://help.github.com/en/articles/virtual-environments-for-github-actions#default-environment-variables
+	eventName := os.Getenv("GITHUB_EVENT_NAME")
+	infoLog("Event name: %s\n", eventName)
+	if !(eventName == "issues" || eventName == "pull_request") {
+		infoLog("This GitHub event is neither issues nor pull_requests. Stop executing this action.")
+		infoLog("Please add 'if github.event_name' to the workflow yaml by following https://github.com/takanabe/github-actions-automate-projects/blob/master/README.md ")
+		os.Exit(0)
+	}
 
-	issueID := extractIssueID(payload)
-	infoLog("New issue is found!!")
-	debugLog("Issue ID: %d\n", issueID)
+	// eventID stores issue ID or pull-request ID
+	var eventID int64
+	var err error
+	if eventName == "issues" {
+		payload := issueEventPayload()
+		eventID, err = extractIssueID(payload)
+		errCheck(err)
+	} else if eventName == "pull_request" {
+		payload := pullRequestEventPayload()
+		eventID, err = extractPullRequestID(payload)
+		errCheck(err)
+	}
+
+	infoLog("Payload for %s extract correctly", eventName)
+	debugLog("Target event ID: %d\n", eventID)
 
 	client, ctx := getGitHubClient()
 
 	url := os.Getenv("GITHUB_PROJECT_URL")
 	if url == "" {
-		log.Println("[ERROR] Environment variable GITHUB_PROJECT_URL is not defined in your workflow file")
+		errorLog(errors.New("Environment variable GITHUB_PROJECT_URL is not defined in your workflow file"))
 		os.Exit(1)
 	}
 
@@ -49,14 +64,14 @@ func main() {
 		pjID, err = projectIDByOrg(ctx, client, url, parentName)
 		errCheck(err)
 	} else if pjType == "user" {
-		log.Println("[ERROR] User project is not supported yet")
+		errorLog(errors.New("User project is not supported yet"))
 		os.Exit(1)
 	}
 	infoLog("Project type:%s\n", pjType)
 
 	pjColumn := os.Getenv("GITHUB_PROJECT_COLUMN_NAME")
 	if pjColumn == "" {
-		log.Println("[ERROR] Environment variable PROJECT_COLUMN_NAME is not defined in your workflow file")
+		errorLog(errors.New("Environment variable PROJECT_COLUMN_NAME is not defined in your workflow file"))
 		os.Exit(1)
 	}
 
@@ -68,57 +83,10 @@ func main() {
 	////
 	// Add a new opened issue to a designate project column
 	////
-	err = addIssueToProject(ctx, client, issueID, columnID)
+	err = addToProject(ctx, client, eventID, columnID, eventName)
 	errCheck(err)
 
 	os.Exit(0)
-}
-
-// issueEventPayload returns GitHub issue event payload kept in the payload file .
-// GITHUB_EVENT_PATH keeps the path to the file that contains the payload of the event that triggered the workflow.
-// See: https://developer.github.com/actions/creating-github-actions/accessing-the-runtime-environment/#environment-variables
-func issueEventPayload() github.IssuesEvent {
-	var jsonFilePath string
-	_, ok := os.LookupEnv("GITHUB_ACTION_LOCAL")
-	if ok {
-		// Use local test payload
-		// https://developer.github.com/v3/activity/events/types/#issuesevent
-		var err error
-		jsonFilePath, err = filepath.Abs("./payload/issue_event.json")
-		if err != nil {
-			log.Fatalf("[ERROR] No such a file: %e", err)
-		}
-	} else {
-		jsonFilePath = os.Getenv("GITHUB_EVENT_PATH")
-	}
-	jsonFile, err := os.Open(jsonFilePath)
-	if err != nil {
-		log.Fatalf("[ERROR] Failed to open json: %e", err)
-	}
-	defer jsonFile.Close()
-
-	// read opened jsonFile as a byte array.
-	jsonByte, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		log.Fatalf("[ERROR] Failed to read json as a byte array: %e", err)
-	}
-
-	payload := github.IssuesEvent{}
-	err = json.Unmarshal(jsonByte, &payload)
-	if err != nil {
-		log.Fatalf("[ERROR] Failed to unmarshal JSON to Go Object: %e", err)
-	}
-	if payload.GetAction() != "opened" {
-		fmt.Println("GitHub action interupts!!")
-		fmt.Println("This issue is not new one :D")
-		os.Exit(0)
-	}
-	return payload
-}
-
-// extractIssueID returns GitHub issue ID extracted from event payloads
-func extractIssueID(payload github.IssuesEvent) int64 {
-	return payload.GetIssue().GetID()
 }
 
 func getGitHubClient() (*github.Client, context.Context) {
@@ -219,7 +187,7 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 	for _, project := range projects {
 		if project.GetHTMLURL() == url {
 			projectID = project.GetID()
-			fmt.Println("Project Name: " + project.GetName())
+			infoLog("Project Name: " + project.GetName())
 			infoLog("Project ID: %d\n", projectID)
 			break
 		}
@@ -255,11 +223,17 @@ func projectColumnID(ctx context.Context, client *github.Client, pjID int64, pjC
 	return columnID, nil
 }
 
-func addIssueToProject(ctx context.Context, client *github.Client, issueID int64, columnID int64) error {
-	opt := &github.ProjectCardOptions{
-		ContentID:   issueID,
-		ContentType: "Issue",
+func addToProject(ctx context.Context, client *github.Client, eventID, columnID int64, eventName string) error {
+	opt := &github.ProjectCardOptions{}
+
+	if eventName == "issues" {
+		opt.ContentID = eventID
+		opt.ContentType = "Issue"
+	} else if eventName == "pull_request" {
+		opt.ContentID = eventID
+		opt.ContentType = "PullRequest"
 	}
+
 	card, res, err := client.Projects.CreateProjectCard(ctx, columnID, opt)
 
 	err = validateGitHubResponse(res, err)
@@ -271,7 +245,7 @@ func addIssueToProject(ctx context.Context, client *github.Client, issueID int64
 		return errors.New("Failed to create a card")
 	}
 
-	infoLog("Created card %d! issue %d is placed to ColumnID %d", card.GetID(), issueID, columnID)
+	infoLog("Created card %d! issue %d is placed to ColumnID %d", card.GetID(), eventID, columnID)
 	return nil
 }
 

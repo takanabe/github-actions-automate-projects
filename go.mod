@@ -1,4 +1,4 @@
-module github.com/takanabe/add-new-issues-to-project-column
+module github.com/takanabe/github-actions-automate-projects
 
 require (
 	github.com/google/go-github/v25 v25.0.4

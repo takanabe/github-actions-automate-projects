@@ -1,5 +1,5 @@
-IMAGE_NAME=add-new-issues-to-project-column
-DOCKER_REPO=takanabe/add-new-issues-to-project-column
+IMAGE_NAME=github-actions-automate-projects
+DOCKER_REPO=takanabe/github-actions-automate-projects
 TAG_NAME=sandbox
 
 #
@@ -13,7 +13,7 @@ all: docker-build docker-tag docker-publish
 #
 .PHONY: docker-build
 docker-build:
-	docker build -f Dockerfile.build . -t $(IMAGE_NAME):$(TAG_NAME)
+	docker build --no-cache  -f Dockerfile.build . -t $(IMAGE_NAME):$(TAG_NAME)
 
 #
 # Build Docker image with DockerHub repository
