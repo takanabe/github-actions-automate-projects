@@ -13,7 +13,7 @@ all: docker-build docker-tag docker-publish
 #
 .PHONY: docker-build
 docker-build:
-	docker build -f Dockerfile.build . -t $(IMAGE_NAME):$(TAG_NAME)
+	docker build --no-cache  -f Dockerfile.build . -t $(IMAGE_NAME):$(TAG_NAME)
 
 #
 # Build Docker image with DockerHub repository
