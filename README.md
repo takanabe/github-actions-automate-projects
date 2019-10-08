@@ -12,7 +12,6 @@ GitHub Actions adding GitHub Issues & Pull requests to the specified GitHub Proj
 
 GitHub Projects belong to organizations, repositories, and users. This GitHub action currently does not support user-based GitHub Project. For any type of GitHub Projects, you need to change `GITHUB_PROJECT_URL` and `GITHUB_PROJECT_COLUMN_NAME` depending on your GitHub Project URL and column name to which you want to add new cards. Create `.github/workflows/issues.yml` file on your repository and edit like below.
 
-
 ### Repository-based project
 
 ```yml
@@ -72,6 +71,10 @@ jobs:
 User-based project is not supported yet
 
 ## Configurations
+
+### Docker images
+
+Docker images for this action are automatically built when master branch is updated or new release tags are created in this repository with `latest` and corresponded tag names (e.g: `v.0.0.1`). Please use `uses: docker://takanabe/github-actions-automate-projects:v0.0.1` and `uses: docker://takanabe/github-actions-automate-projects:latest` syntax to use pre-build images for this GitHub Actions.
 
 ### Environment variables
 

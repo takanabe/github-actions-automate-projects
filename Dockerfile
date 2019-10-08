@@ -1,4 +1,4 @@
-FROM takanabe/github-actions-automate-projects:v0.0.1
+FROM takanabe/github-actions-automate-projects:latest
 
 LABEL "com.github.actions.name"="Automate projects"
 LABEL "com.github.actions.description"="GitHub Actions adding GitHub Issues & Pull requests to the specified GitHub Project column automatically ♻️"
