@@ -44,11 +44,6 @@ func issueEventPayload() github.IssuesEvent {
 	if err != nil {
 		errorLog(errors.Wrap(err, "Failed to unmarshal JSON to Go Object"))
 	}
-	if payload.GetAction() != "opened" {
-		infoLog("GitHub action interupts!!")
-		infoLog("This issue is not new one :D")
-		os.Exit(0)
-	}
 
 	return payload
 }
