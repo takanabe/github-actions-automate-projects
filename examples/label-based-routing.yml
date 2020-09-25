@@ -1,0 +1,27 @@
+name: Add a new GitHub Project card to the specified project column based on issue labels
+on: [issues]
+jobs:
+  github-actions-automate-projects:
+    runs-on: ubuntu-latest
+    steps:
+    - name: add-new-issues-to-sre-tech-radar-project
+      uses: docker://takanabe/github-actions-automate-projects:latest
+      if: github.event_name == 'issues' && github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'Category:Tech Radar')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PROJECT_URL: https://github.com/ORGANIXATION/REPOSITORY/projects/3
+        GITHUB_PROJECT_COLUMN_NAME: Backlog
+    - name: add-new-kaizen-to-sre-kanban
+      uses: docker://takanabe/github-actions-automate-projects:latest
+      if: github.event_name == 'issues' && github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'Type:Kaizen')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PROJECT_URL: https://github.com/ORGANIXATION/REPOSITORY/projects/4
+        GITHUB_PROJECT_COLUMN_NAME: Kaizen Backlog
+    - name: add-new-toil-to-sre-kanban
+      uses: docker://takanabe/github-actions-automate-projects:latest
+      if: github.event_name == 'issues' && github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'Type:Toil')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PROJECT_URL: https://github.com/ORGANIXATION/REPOSITORY/projects/4
+        GITHUB_PROJECT_COLUMN_NAME: Toil Backlog
