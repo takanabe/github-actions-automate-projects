@@ -24,22 +24,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// eventID stores issue ID or pull-request ID
-	var eventID int64
 	var err error
-	if eventName == "issues" {
-		payload := issueEventPayload()
-		eventID, err = extractIssueID(payload)
-		errCheck(err)
-	} else if eventName == "pull_request" {
-		payload := pullRequestEventPayload()
-		eventID, err = extractPullRequestID(payload)
-		errCheck(err)
-	}
-
-	infoLog("Payload for %s extract correctly", eventName)
-	debugLog("Target event ID: %d\n", eventID)
-
 	client, ctx := getGitHubClient()
 
 	url := os.Getenv("GITHUB_PROJECT_URL")
@@ -55,6 +40,24 @@ func main() {
 
 	parentResource, parentName, err := projectParentName(url)
 	errCheck(err)
+
+	// eventID stores issue ID or pull-request ID
+	var eventID int64
+	var projectCards []*github.ProjectCard
+	if eventName == "issues" {
+		payload := issueEventPayload()
+		eventID, err = extractIssueID(payload)
+		errCheck(err)
+		projectCards, err = getProjectCardsFromIssue(ctx, client, payload.Issue, parentResource, parentName)
+		errCheck(err)
+	} else if eventName == "pull_request" {
+		payload := pullRequestEventPayload()
+		eventID, err = extractPullRequestID(payload)
+		errCheck(err)
+	}
+
+	infoLog("Payload for %s extract correctly", eventName)
+	debugLog("Target event ID: %d\n", eventID)
 
 	var pjID int64
 	if pjType == "repository" {
@@ -77,6 +80,21 @@ func main() {
 
 	columnID, err := projectColumnID(ctx, client, pjID, pjColumn)
 	errCheck(err)
+
+	for _, card := range projectCards {
+		if *card.ProjectID == pjID {
+			// Check card still exists
+			// Ignore errors - if the card has been deleted, we want to respect the workflow and create it
+			c, _, _ := client.Projects.GetProjectCard(ctx, *card.ID)
+			if c == nil {
+				continue
+			}
+			infoLog("Project card is being moved to column %s\n", pjColumn)
+			err = moveCardInProject(ctx, client, columnID, card)
+			errCheck(err)
+			os.Exit(0)
+		}
+	}
 
 	infoLog("Project card is being added to column %s\n", pjColumn)
 
@@ -266,6 +284,31 @@ func validateGitHubResponse(res *github.Response, err error) error {
 
 	if !(res.Response.StatusCode == http.StatusOK || res.Response.StatusCode == http.StatusCreated) {
 		return errors.Errorf("Invalid status code: %s. Failed to get results from GitHub", res.Status)
+	}
+	return nil
+}
+
+func getProjectCardsFromIssue(ctx context.Context, client *github.Client, issue *github.Issue, owner string, repo string) ([]*github.ProjectCard, error) {
+	cards := []*github.ProjectCard{}
+	// TODO: Pagination, but let's assume any project will be in the first set of results.
+	events, resp, err := client.Issues.ListIssueEvents(ctx, owner, repo, *issue.Number, nil)
+	err = validateGitHubResponse(resp, err)
+	if err != nil {
+		return cards, err
+	}
+	for _, event := range events {
+		if event.ProjectCard != nil {
+			cards = append(cards, event.ProjectCard)
+		}
+	}
+	return cards, nil
+}
+
+func moveCardInProject(ctx context.Context, client *github.Client, columnID int64, card *github.ProjectCard) error {
+	resp, err := client.Projects.MoveProjectCard(ctx, *card.ID, &github.ProjectCardMoveOptions{ColumnID: columnID, Position: "top"})
+	err = validateGitHubResponse(resp, err)
+	if err != nil {
+		return err
 	}
 	return nil
 }
