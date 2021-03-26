@@ -256,6 +256,11 @@ func addToProject(ctx context.Context, client *github.Client, eventID, columnID 
 
 	err = validateGitHubResponse(res, err)
 	if err != nil {
+		// Catch error if the issue is already on that
+		if err.Message == "Project already has the associated issue" {
+			infoLog("Project already has the associated issue...skipping")
+			return nil
+		}
 		return err
 	}
 
