@@ -40,6 +40,24 @@ func main() {
 
 	parentResource, parentName, err := projectParentName(url)
 	errCheck(err)
+	
+	var pjID int64
+	var pjName string
+	var pjOwner string
+	if pjType == "repository" {
+		pjID, err = projectIDByRepo(ctx, client, url, parentResource, parentName)
+		pjName = parentName
+		pjOwner = parentResource
+		errCheck(err)
+	} else if pjType == "organization" {
+		pjID, pjName, err = projectIDAndNameByOrg(ctx, client, url, parentName)
+		pjOwner = parentName
+		errCheck(err)
+	} else if pjType == "user" {
+		errorLog(errors.New("User project is not supported yet"))
+		os.Exit(1)
+	}
+	infoLog("Project type:%s\n", pjType)
 
 	// eventID stores issue ID or pull-request ID
 	var eventID int64
@@ -48,7 +66,7 @@ func main() {
 		payload := issueEventPayload()
 		eventID, err = extractIssueID(payload)
 		errCheck(err)
-		projectCards, err = getProjectCardsFromIssue(ctx, client, payload.Issue, parentResource, parentName)
+		projectCards, err = getProjectCardsFromIssue(ctx, client, payload.Issue, pjOwner, pjName)
 		errCheck(err)
 	} else if eventName == "pull_request" {
 		payload := pullRequestEventPayload()
@@ -58,19 +76,6 @@ func main() {
 
 	infoLog("Payload for %s extract correctly", eventName)
 	debugLog("Target event ID: %d\n", eventID)
-
-	var pjID int64
-	if pjType == "repository" {
-		pjID, err = projectIDByRepo(ctx, client, url, parentResource, parentName)
-		errCheck(err)
-	} else if pjType == "organization" {
-		pjID, err = projectIDByOrg(ctx, client, url, parentName)
-		errCheck(err)
-	} else if pjType == "user" {
-		errorLog(errors.New("User project is not supported yet"))
-		os.Exit(1)
-	}
-	infoLog("Project type:%s\n", pjType)
 
 	pjColumn := os.Getenv("GITHUB_PROJECT_COLUMN_NAME")
 	if pjColumn == "" {
@@ -188,8 +193,9 @@ func projectIDByRepo(ctx context.Context, client *github.Client, url, owner, rep
 	return projectID, nil
 }
 
-func projectIDByOrg(ctx context.Context, client *github.Client, url, org string) (int64, error) {
+func projectIDAndNameByOrg(ctx context.Context, client *github.Client, url, org string) (int64, string, error) {
 	var projectID int64
+	var projectName string
 	opt := &github.ProjectListOptions{
 		ListOptions: github.ListOptions{
 			PerPage: 200,
@@ -205,7 +211,8 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 	for _, project := range projects {
 		if project.GetHTMLURL() == url {
 			projectID = project.GetID()
-			infoLog("Project Name: " + project.GetName())
+			projectName = project.GetName()
+			infoLog("Project Name: " + projectName)
 			infoLog("Project ID: %d\n", projectID)
 			break
 		}
@@ -214,7 +221,7 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 	if projectID == 0 {
 		return 0, errors.New("No such a project url: " + url)
 	}
-	return projectID, nil
+	return projectID, projectName, nil
 }
 
 func projectColumnID(ctx context.Context, client *github.Client, pjID int64, pjColumn string) (int64, error) {
