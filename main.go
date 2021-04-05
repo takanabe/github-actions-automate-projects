@@ -40,7 +40,7 @@ func main() {
 
 	parentResource, parentName, err := projectParentName(url)
 	errCheck(err)
-	
+
 	// eventID stores issue ID or pull-request ID
 	var eventID int64
 	var projectCards []*github.ProjectCard
@@ -63,7 +63,7 @@ func main() {
 
 	infoLog("Payload for %s extract correctly", eventName)
 	debugLog("Target event ID: %d\n", eventID)
-	
+
 	var pjID int64
 	if pjType == "repository" {
 		pjID, err = projectIDByRepo(ctx, client, url, parentResource, parentName)
@@ -76,7 +76,6 @@ func main() {
 		os.Exit(1)
 	}
 	infoLog("Project type:%s\n", pjType)
-
 
 	pjColumn := os.Getenv("GITHUB_PROJECT_COLUMN_NAME")
 	if pjColumn == "" {
@@ -211,7 +210,6 @@ func projectIDByRepo(ctx context.Context, client *github.Client, url, owner, rep
 
 func projectIDByOrg(ctx context.Context, client *github.Client, url, org string) (int64, error) {
 	var projectID int64
-	var projectName string
 	opt := &github.ProjectListOptions{
 		ListOptions: github.ListOptions{
 			PerPage: 200,
@@ -227,7 +225,6 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 	for _, project := range projects {
 		if project.GetHTMLURL() == url {
 			projectID = project.GetID()
-			infoLog("Project Name: " + projectName)
 			infoLog("Project ID: %d\n", projectID)
 			break
 		}
