@@ -46,9 +46,14 @@ func main() {
 	var projectCards []*github.ProjectCard
 	if eventName == "issues" {
 		payload := issueEventPayload()
+		
 		eventID, err = extractIssueID(payload)
 		errCheck(err)
-		projectCards, err = getProjectCardsFromIssue(ctx, client, payload.Issue, parentResource, parentName)
+		
+		repoOwner, repoName, err := repoOwnerAndName(payload.Issue.RepositoryUrl)
+	        errCheck(err)
+		
+		projectCards, err = getProjectCardsFromIssue(ctx, client, payload.Issue, repoOwner, repoName)
 		errCheck(err)
 	} else if eventName == "pull_request" {
 		payload := pullRequestEventPayload()
@@ -160,6 +165,21 @@ func projectParentName(rawURL string) (string, string, error) {
 	return path[1], path[2], nil
 }
 
+func repoOwnerAndName(rawApiURL string) (string, string, error) {
+	u, err := url.Parse(rawApiURL)
+	if err != nil {
+		return "", "", errors.New("Failed to parse URL")
+	}
+	// A "Get Repository API" URL must be formed with https://api.github.com/repos/REPO_OWNER/REPO_NAME style.
+	// (e.g)
+	//   - (repo) https://github.com/username/reponame/projects/1
+	//   - (org) https://github.com/orgname/reponame/1
+	// Thus, organization and user repository owner and name can be extracted from given project URL as REPO_OWNER
+	// and REPO_NAME, respectively.
+	path := strings.Split(u.Path, "/")
+	return path[2], path[3], nil
+}
+
 func projectIDByRepo(ctx context.Context, client *github.Client, url, owner, repo string) (int64, error) {
 	var projectID int64
 	projects, res, err := client.Repositories.ListProjects(ctx, owner, repo, nil)
@@ -205,7 +225,6 @@ func projectIDByOrg(ctx context.Context, client *github.Client, url, org string)
 	for _, project := range projects {
 		if project.GetHTMLURL() == url {
 			projectID = project.GetID()
-			infoLog("Project Name: " + project.GetName())
 			infoLog("Project ID: %d\n", projectID)
 			break
 		}
